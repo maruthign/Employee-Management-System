@@ -1,9 +1,10 @@
 package com.kodnest.employeemanagementsystem;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 
-public class Splash extends JFrame {
+public class Splash extends JFrame implements ActionListener {
     Splash() {
 
         getContentPane().setBackground(Color.white);
@@ -27,10 +28,16 @@ public class Splash extends JFrame {
         clickhere.setBackground(Color.WHITE);
         clickhere.setForeground(Color.BLACK);
         image.add(clickhere);
+        clickhere.addActionListener(this);
 
         setSize(1170, 650);
         setLocation(200, 50);
         setVisible(true);
+    }
+
+    public void actionPerformed(ActionEvent ae) {
+        setVisible(false);
+        new Login();
     }
 
     public static void main(String[] args) {
