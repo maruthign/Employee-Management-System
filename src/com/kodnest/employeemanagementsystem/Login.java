@@ -2,18 +2,23 @@ package com.kodnest.employeemanagementsystem;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.ResultSet;
 
-public class Login extends JFrame {
+public class Login extends JFrame implements ActionListener {
+
+    JTextField tfUsername, tfPassword;
 
     Login() {
         getContentPane().setBackground(Color.WHITE);
         setLayout(null);
 
-        JLabel username = new JLabel("Username");
+        JLabel  username = new JLabel("Username");
         username.setBounds(40, 20, 100, 30);
         add(username);
 
-        JTextField tfUsername = new JTextField();
+        tfUsername = new JTextField();
         tfUsername.setBounds(150,20,150,30);
         add(tfUsername);
 
@@ -21,7 +26,7 @@ public class Login extends JFrame {
         password.setBounds(40, 70, 100, 30);
         add(password);
 
-        JTextField tfPassword = new JTextField();
+        tfPassword = new JTextField();
         tfPassword.setBounds(150,70,150,30);
         add(tfPassword);
 
@@ -29,6 +34,7 @@ public class Login extends JFrame {
         login.setBounds(150, 140, 150, 30);
         login.setBackground(Color.WHITE);
         login.setForeground(Color.BLACK);
+        login.addActionListener(this);
         add(login);
 
         ImageIcon i1 = new ImageIcon(ClassLoader.getSystemResource("icons/second.jpg"));
@@ -42,6 +48,26 @@ public class Login extends JFrame {
         setSize(600, 300);
         setLocation(450, 200);
         setVisible(true);
+    }
+
+    public void actionPerformed(ActionEvent ae) {
+        try {
+            String username = tfUsername.getText();
+            String password = tfPassword.getText();
+
+            Conn c = new Conn();
+            String query = "select * from login where username = '" + username + "' and password = '" +  password + "'";
+            ResultSet rs = c.s.executeQuery(query);
+
+            if(rs.next()) {
+                setVisible(false);
+            } else {
+                JOptionPane.showMessageDialog(null, "Invalid username or password");
+                setVisible(false);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
