@@ -2,14 +2,21 @@ package com.kodnest.employeemanagementsystem;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Random;
 
 import com.toedter.calendar.JDateChooser;
 
-public class AddEmployee extends JFrame {
+public class AddEmployee extends JFrame implements ActionListener {
 
     Random ran = new Random();
     int number = ran.nextInt(999999);
+
+    JTextField tfname, tfsalary, tfaddress, tfphone, tfemail, tfeducation, tfaadhar, tfdesignation;
+    JDateChooser dcdob;
+    JLabel lblid;
+    JButton add, back;
 
     AddEmployee() {
         getContentPane().setBackground(Color.WHITE);
@@ -26,7 +33,7 @@ public class AddEmployee extends JFrame {
         labelname.setFont(new Font("serif", Font.PLAIN, 20));
         add(labelname);
 
-        JTextField tfname = new JTextField();
+        tfname = new JTextField();
         tfname.setBounds(200, 150, 150,30);
         add(tfname);
 
@@ -35,7 +42,7 @@ public class AddEmployee extends JFrame {
         labeldob.setFont(new Font("serif", Font.PLAIN, 20));
         add(labeldob);
 
-        JDateChooser dcdob = new JDateChooser();
+        dcdob = new JDateChooser();
         dcdob.setBounds(200, 200, 150, 30);
         add(dcdob);
 
@@ -44,7 +51,7 @@ public class AddEmployee extends JFrame {
         labelsalary.setFont(new Font("serif", Font.PLAIN, 20));
         add(labelsalary);
 
-        JTextField tfsalary = new JTextField();
+        tfsalary = new JTextField();
         tfsalary.setBounds(600, 150, 150,30);
         add(tfsalary);
 
@@ -53,7 +60,7 @@ public class AddEmployee extends JFrame {
         labeladdress.setFont(new Font("serif", Font.PLAIN, 20));
         add(labeladdress);
 
-        JTextField tfaddress = new JTextField();
+        tfaddress = new JTextField();
         tfaddress.setBounds(600, 200, 150,30);
         add(tfaddress);
 
@@ -61,8 +68,7 @@ public class AddEmployee extends JFrame {
         labelphone.setBounds(50, 250, 150, 30);
         labelphone.setFont(new Font("serif", Font.PLAIN, 20));
         add(labelphone);
-
-        JTextField tfphone = new JTextField();
+        tfphone = new JTextField();
         tfphone.setBounds(200, 250, 150,30);
         add(tfphone);
 
@@ -71,7 +77,7 @@ public class AddEmployee extends JFrame {
         labelemail.setFont(new Font("serif", Font.PLAIN, 20));
         add(labelemail);
 
-        JTextField tfemail = new JTextField();
+        tfemail = new JTextField();
         tfemail.setBounds(600, 250, 150,30);
         add(tfemail);
 
@@ -80,7 +86,7 @@ public class AddEmployee extends JFrame {
         labeleducation.setFont(new Font("serif", Font.PLAIN, 20));
         add(labeleducation);
 
-        JTextField tfeducation = new JTextField();
+        tfeducation = new JTextField();
         tfeducation.setBounds(600, 300, 150,30);
         add(tfeducation);
 
@@ -89,7 +95,7 @@ public class AddEmployee extends JFrame {
         labeldesignation.setFont(new Font("serif", Font.PLAIN, 20));
         add(labeldesignation);
 
-        JTextField tfdesignation = new JTextField();
+        tfdesignation = new JTextField();
         tfdesignation.setBounds(200, 300, 150,30);
         add(tfdesignation);
 
@@ -98,7 +104,7 @@ public class AddEmployee extends JFrame {
         labelaadhar.setFont(new Font("serif", Font.PLAIN, 20));
         add(labelaadhar);
 
-        JTextField tfaadhar = new JTextField();
+        tfaadhar = new JTextField();
         tfaadhar.setBounds(200, 350, 150,30);
         add(tfaadhar);
 
@@ -107,21 +113,23 @@ public class AddEmployee extends JFrame {
         labelid.setFont(new Font("serif", Font.PLAIN, 20));
         add(labelid);
 
-        JLabel lblid = new JLabel("" + number);
+        lblid = new JLabel("" + number);
         lblid.setBounds(600, 350, 150, 30);
         lblid.setFont(new Font("serif", Font.PLAIN, 20));
         add(lblid);
 
-        JButton add = new JButton("Add Employee");
+        add = new JButton("Add");
         add.setBounds(250, 550, 150, 40);
-//      add.addActionListener(this);
+        add.setFont(new Font("serif", Font.BOLD, 20));
+        add.addActionListener(this);
         add.setBackground(Color.WHITE);
         add.setForeground(Color.BLACK);
         add(add);
 
-        JButton back = new JButton("Back");
+        back = new JButton("Back");
         back.setBounds(450, 550, 150, 40);
-//      add.addActionListener(this);
+        back.setFont(new Font("serif", Font.BOLD, 20));
+        back.addActionListener(this);
         back.setBackground(Color.WHITE);
         back.setForeground(Color.BLACK);
         add(back);
@@ -129,6 +137,36 @@ public class AddEmployee extends JFrame {
         setSize(900, 700);
         setLocation(300, 50);
         setVisible(true);
+    }
+
+    public void actionPerformed(ActionEvent ae) {
+
+        if (ae.getSource() == add) {
+            String name = tfname.getText();
+            String dob = ((JTextField) dcdob.getDateEditor().getUiComponent()).getText();
+            String salary = tfsalary.getText();
+            String address = tfaddress.getText();
+            String phone = tfphone.getText();
+            String email = tfemail.getText();
+            String education = tfeducation.getText();
+            String designation = tfdesignation.getText();
+            String aadhar = tfaadhar.getText();
+            String empId = lblid.getText();
+
+            try {
+                Conn con = new Conn();
+                String query = "INSERT INTO  Employee values ('"+empId+"', '"+name+"', '"+dob+"', '"+phone+"', '"+salary+"', '"+address+"', '"+email+"', '"+designation+"', '"+education+"', '"+aadhar+"')";
+                con.s.executeUpdate(query);
+                JOptionPane.showMessageDialog(null, "Details added successfully");
+                setVisible(false);
+                new Home();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            setVisible(false);
+            new Home();
+        }
     }
 
     public static void main(String[] args) {
