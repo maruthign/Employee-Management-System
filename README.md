@@ -1,100 +1,106 @@
-# 💼 Employee Management System – Java Swing + MySQL
+# Employee Management System (Java Swing + MySQL)
 
-This project is a **desktop-based Employee Management System (EMS)** built using **Java Swing** and **MySQL**.  
-It provides a complete GUI for managing employee data — including modules for **Splash**, **Login**, **Home**, **Add Employee**, and **View Employee**.
-
----
-
-## 🚀 Features Overview
-
-| Module | Description |
-|---------|-------------|
-| 🖥 **Splash Screen** | Intro screen with project title and transition to the login window |
-| 🔐 **Login Screen** | Secure login form connected to MySQL authentication table |
-| 🏠 **Home Dashboard** | Central navigation hub with Add, View, Update, and Remove employee options |
-| 👨‍💼 **Add Employee** | Add new employees with DOB picker and auto-generated Employee ID |
-| 📋 **View Employee** | View all employees in a JTable, search by ID, and print records |
-| 🧩 **Database Connection** | JDBC connection class for reusability across modules |
+A desktop Employee Management System (EMS) built with **Java Swing** and **MySQL**.  
+Provides a GUI to **add**, **view**, and **update** employee records with a simple login flow.
 
 ---
 
-## 🖥️ Splash Screen (`Splash.java`)
-- Displays a modern welcome window titled **"Employee Management System"**.  
-- Uses `front.jpg` background image with custom font styling.  
-- Includes a button **“CLICK HERE TO CONTINUE”** that transitions to the **Login** screen.  
-- Acts as the entry point of the project.
+## 🚀 Project Summary
+
+**Language:** Java  
+**UI:** Java Swing  
+**Database:** MySQL (JDBC)  
+**Extras:** `JDateChooser` (jcalendar), `rs2xml` (DbUtils) for `ResultSet -> JTable` conversion
+
+Modules:
+- Splash Screen (`Splash.java`)
+- Login (`Login.java`)
+- Home Dashboard (`Home.java`)
+- Add Employee (`AddEmployee.java`)
+- View Employee (`ViewEmployee.java`)
+- Update Employee (`UpdateEmployee.java`)
+- DB Connection (`Conn.java`)
 
 ---
 
-## 🔐 Login Screen (`Login.java`)
-- Simple and secure login form using **Swing** components.  
-- Validates credentials from the **MySQL `login` table**.  
-- Displays a popup on invalid login attempts.  
-- Includes an image (`second.jpg`) for a polished interface.  
-- On successful authentication, redirects to the **Home Dashboard**.
+## ✅ Important: Database column name consistency
+
+Your Java code references the employee primary key column as `ID` in several places (e.g. in `ViewEmployee` and `UpdateEmployee`), while elsewhere code uses `empId` (in `AddEmployee` insert order). To avoid SQL errors, use a *single consistent table schema*.
+
+Use the **recommended schema below** (columns without spaces). If you already created a different schema, either rename columns in the DB or change the Java code to match.
 
 ---
 
-## 🏠 Home Dashboard (`Home.java`)
-- Main control panel after successful login.  
-- Contains buttons for navigation:
-  - ➕ **Add Employee** — Opens employee registration form.  
-  - 👁 **View Employees** — Displays all employee data in a table.  
-  - ✏️ **Update Employee** *(Coming Soon)*  
-  - ❌ **Remove Employee** *(Coming Soon)*  
-- Styled with a background image (`home.jpg`) and clean layout.
+## 🗂 Recommended MySQL schema (run in MySQL)
 
----
+```sql
+CREATE DATABASE IF NOT EXISTS employeemanagementsystem;
+USE employeemanagementsystem;
 
-## 👨‍💼 Add Employee Module (`AddEmployee.java`)
-- Allows administrators to add new employee records easily.  
-- Features:
-  - Auto-generated **Employee ID** using Java `Random`.
-  - Uses `JDateChooser` for **Date of Birth** input.
-  - Collects personal and professional details:
-    - Name  
-    - Date of Birth  
-    - Salary  
-    - Address  
-    - Phone  
-    - Email  
-    - Education  
-    - Designation  
-    - Aadhar Number  
-  - Inserts data into the MySQL `Employee` table via JDBC.
-  - Displays success/failure messages via `JOptionPane`.
-- Buttons:
-  - ✅ **Add** — Saves employee details.  
-  - ⬅️ **Back** — Returns to the Home screen.
+-- login table (for app login)
+CREATE TABLE IF NOT EXISTS login (
+  username VARCHAR(50) NOT NULL PRIMARY KEY,
+  password VARCHAR(255) NOT NULL
+);
 
----
+INSERT INTO login (username, password) VALUES ('admin', 'admin123');
 
-## 📋 View Employee Module (`ViewEmployee.java`)
-- Displays all employee records in a **JTable**.  
-- Uses `DbUtils` (from `net.proteanit.sql.DbUtils`) for direct `ResultSet` to table conversion.  
-- Features:
-  - 🔍 **Search by Employee ID** — Quickly filter records.  
-  - 🖨 **Print** — Print employee records with header and footer support.  
-  - ✏️ **Update** — (Placeholder for next version).  
-  - ⬅️ **Back** — Returns to Home.  
-- Provides smooth scrolling with `JScrollPane`.
-
----
-
-## 🧩 Database Connection (`Conn.java`)
-- Manages connection to MySQL using JDBC.  
-- Reusable across all project modules.  
-- Connection details:
-  ```java
-  String url = "jdbc:mysql://localhost:3306/employeemanagementsystem";
-  String user = "root";
-  String pass = "your_password";
-
----
-
-## 🗂️ Project Structure
+-- employee table (consistent column names used by the Java code)
+CREATE TABLE IF NOT EXISTS Employee (
+  ID VARCHAR(20) PRIMARY KEY,
+  Name VARCHAR(100),
+  DOB VARCHAR(30),
+  Phone VARCHAR(20),
+  Salary VARCHAR(20),
+  Address VARCHAR(150),
+  Email VARCHAR(100),
+  Designation VARCHAR(100),
+  Education VARCHAR(100),
+  Aadhar VARCHAR(30)
+);
 ```
-  EmployeeManagementSystem/
+### Notes
+- ID is used as the primary key in the Java code (so the table uses ID).
+- Column names are simple and do not contain spaces (recommended).
+- DOB is stored as VARCHAR in your current implementation; you can later change to DATE and adjust code to use java.sql.Date.
+
+
+---
+
+## 🔌 Dependencies (add to project classpath)
+- mysql-connector-j-<version>.jar — JDBC driver
+- jcalendar.jar — JDateChooser
+- rs2xml.jar — DbUtils (ResultSet → JTable)
+
+- Place these jars in your IDE project’s library/classpath.
+
+---
+
+## ⚙️ Configure database connection
+
+# Open Conn.java and set your DB credentials:
+```
+String url = "jdbc:mysql://localhost:3306/employeemanagementsystem";
+String user = "root";
+String pass = "your_password_here";  // change this
+```
+
+---
+
+## ▶️ How to run
+1.	Create the database & tables with the SQL above.
+2.	Set DB credentials in Conn.java.
+3.	Add required JARs to the project’s classpath.
+4.	Compile and run Splash.java (it launches the login screen which flows to Home → Add/View).
+  - Or run Login.java directly for quicker testing.
+
+
+---
+
+
+## 🧩 Files & Structure
+```
+EmployeeManagementSystem/
 ├── src/
 │   └── com/kodnest/employeemanagementsystem/
 │       ├── Splash.java
@@ -102,89 +108,87 @@ It provides a complete GUI for managing employee data — including modules for 
 │       ├── Home.java
 │       ├── AddEmployee.java
 │       ├── ViewEmployee.java
+│       ├── UpdateEmployee.java
 │       └── Conn.java
 └── icons/
     ├── front.jpg
     ├── second.jpg
     └── home.jpg
 ```
----
-
-## ⚙️ Database Setup (MySQL)
-
-### 1️⃣ Create the Database
-```
-CREATE DATABASE employeemanagementsystem;
-USE employeemanagementsystem;
-```
-### 2️⃣ Create the login Table
-```
-CREATE TABLE login (
-    username VARCHAR(50),
-    password VARCHAR(50)
-);
-```
-#### Insert sample credentials:
-```
-INSERT INTO login (username, password) VALUES ('admin', 'admin123');
-```
-
-### 3️⃣ Create the Employee Table
-```
-CREATE TABLE Employee (
-    empId VARCHAR(20) PRIMARY KEY,
-    name VARCHAR(50),
-    dob VARCHAR(20),
-    phone VARCHAR(15),
-    salary VARCHAR(20),
-    address VARCHAR(100),
-    email VARCHAR(50),
-    designation VARCHAR(50),
-    education VARCHAR(50),
-    aadhar VARCHAR(20)
-);
-```
 
 ---
 
-## ▶️ How to Run
+## 🔍 Known issues & suggestions (do these to make the app more robust)
 
-1.	Open the project in your Java IDE (Eclipse / IntelliJ / VS Code).
-2.	Ensure your package path matches com.kodnest.employeemanagementsystem.
-3.	Add the following JAR files to your project classpath:
--	mysql-connector-j.jar
--	jcalendar.jar (for JDateChooser)
--	rs2xml.jar (for DbUtils)
-4.	Place all image files inside the /icons folder.
-5.	Start the application by running:
+1. Inconsistent column names  
+   - Make sure your table column names match what the Java code expects (recommended schema above).  
+   - Example mismatch in your code: `AddEmployee` inserts a generated `empId` but `ViewEmployee`/`UpdateEmployee` query `ID`. Use `ID` across DB and code.
 
-## 🧩 Tech Stack
+2. Use `PreparedStatement`  
+   - Your code currently builds SQL with string concatenation (vulnerable to SQL injection and syntax errors). Replace `Statement` + string concatenation with `PreparedStatement` for inserts/updates/searches.
 
-| Componenet            | Technolgy Used          |
-|-----------------------|-----------------------  |
-| Language              | Java                    | 
-| GUI Framework         | Java Swing              |
-| Database              | MySQL                   |
-| JDBC Connector        | mysql-connector-j       |
-| Additional Libraries  | JCalendar, DbUtils      |
-| IDE Support | Eclipse | IntelliJ IDEA / VS Code |
-| OS Compatibility      | Windows, macOS, Linux   | 
+3. Standardize date column  
+   - If you plan to use date operations later, store `DOB` as `DATE` and convert `JDateChooser`’s value when inserting/updating.
 
+4. Password storage  
+   - Store hashed passwords (e.g., BCrypt) instead of plain text for the `login` table.
 
-## 🌟 Future Enhancements
+5. Form validation  
+   - Add input validation for phone numbers, email format, Aadhar length, salary numeric checks, required fields, etc.
 
-- Implement full Update and Remove Employee functionality.
-- Add Employee Search Filters (by name, department, etc.).
--	Implement Password Encryption (BCrypt) for login security.
--	Add Register, Forgot Password, and Admin Dashboard modules.
--	Introduce Validation & Error Handling (email, phone, aadhar).
--	Improve UI using custom colors, gradients, and icons.
--	Export data to Excel or PDF.
+6. Fix UI labels  
+   - `UpdateEmployee` heading currently shows `"Add new Employee"`. Change to `"Update Employee"` for clarity.  
+   - Code fix (replace the heading line in `UpdateEmployee` constructor):
+     ```java
+     JLabel heading = new JLabel("Update Employee");
+     ```
 
-## 👨‍💻 Developer Information
+7. Error handling & messages  
+   - Show user-friendly error messages and log stack traces to console/file only.
+  
+---
 
-- Name: Maruthi G N
-- Project: Employee Management System (Swing + MySQL)
-- Modules Completed: Splash, Login, Home, Add Employee, View Employee
-- Upcoming: Update & Remove Employee
-- Tools Used: Java 17+, MySQL 8+, Eclipse IDE
+## 🛠 Example: safer INSERT using PreparedStatement (recommended)
+
+  - Replace the current concatenated SQL in AddEmployee with something like:
+
+```
+String insertSql = "INSERT INTO Employee (ID, Name, DOB, Phone, Salary, Address, Email, Designation, Education, Aadhar) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+PreparedStatement ps = con.con.prepareStatement(insertSql);
+ps.setString(1, empId);
+ps.setString(2, name);
+ps.setString(3, dob);
+// ... set other params
+ps.executeUpdate();
+ps.close();
+```
+  - Conn already exposes con (a Connection) and s (a Statement), so use con.prepareStatement(...).
+---
+
+## 📌 Quick checklist before running
+  -	JARs added to classpath (mysql-connector, jcalendar, rs2xml)
+	-	MySQL server running
+	-	Database and tables created with the recommended schema (or adapted to your code)
+	-	Conn.java credentials updated
+	-	Images in /icons folder
+
+---
+
+## 📦 Future improvements (next versions)
+  -	Implement Remove Employee
+	-	Implement Update Employee form (editable fields)
+	-	Add search filters (name, designation, salary range)
+	-	Export data (Excel/PDF)
+	-	Improve UI styling and responsive layout
+	-	Add password encryption and role-based access
+
+---
+
+## 👨‍💻 Author
+
+**Maruthi G N** — Employee Management System (Java Swing + MySQL)
+
+If you want, I can:
+
+- provide a fixed `CREATE TABLE` SQL that exactly matches your current Java code (I already included a recommended one above),
+- or update your Java snippets to consistently use `ID` and use `PreparedStatement`s across the project — tell me which and I’ll paste the code changes.
