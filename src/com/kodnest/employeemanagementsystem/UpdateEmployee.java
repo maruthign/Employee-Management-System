@@ -4,21 +4,22 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
 import java.util.Random;
 
 import com.toedter.calendar.JDateChooser;
 
-public class AddEmployee extends JFrame implements ActionListener {
+public class UpdateEmployee extends JFrame implements ActionListener {
 
-    Random ran = new Random();
-    int number = ran.nextInt(000001,999999);
 
     JTextField tfname, tfsalary, tfaddress, tfphone, tfemail, tfeducation, tfaadhar, tfdesignation;
     JDateChooser dcdob;
-    JLabel lblid;
+    JLabel lblid, lbldob, lblname, lblaadhar;
     JButton add, back;
+    String empId;
 
-    AddEmployee() {
+    UpdateEmployee(String empId) {
+        this.empId = empId;
         getContentPane().setBackground(Color.WHITE);
         setLayout(null);
 
@@ -33,18 +34,18 @@ public class AddEmployee extends JFrame implements ActionListener {
         labelname.setFont(new Font("serif", Font.PLAIN, 20));
         add(labelname);
 
-        tfname = new JTextField();
-        tfname.setBounds(200, 150, 150,30);
-        add(tfname);
+        lblname = new JLabel();
+        lblname.setBounds(200, 150, 150,30);
+        add(lblname);
 
         JLabel labeldob = new JLabel("Date of Birth");
         labeldob.setBounds(50, 200, 150, 30);
         labeldob.setFont(new Font("serif", Font.PLAIN, 20));
         add(labeldob);
 
-        dcdob = new JDateChooser();
-        dcdob.setBounds(200, 200, 150, 30);
-        add(dcdob);
+        lbldob = new JLabel();
+        lbldob.setBounds(200, 200, 150, 30);
+        add(lbldob);
 
         JLabel labelsalary = new JLabel("Salary");
         labelsalary.setBounds(450, 150, 150, 30);
@@ -104,21 +105,43 @@ public class AddEmployee extends JFrame implements ActionListener {
         labelaadhar.setFont(new Font("serif", Font.PLAIN, 20));
         add(labelaadhar);
 
-        tfaadhar = new JTextField();
-        tfaadhar.setBounds(200, 350, 150,30);
-        add(tfaadhar);
+        lblaadhar = new JLabel();
+        lblaadhar.setBounds(200, 350, 150,30);
+        add(lblaadhar);
 
         JLabel labelid = new JLabel("Employee ID");
         labelid.setBounds(450, 350, 150, 30);
         labelid.setFont(new Font("serif", Font.PLAIN, 20));
         add(labelid);
 
-        lblid = new JLabel("" + number);
+        lblid = new JLabel();
         lblid.setBounds(600, 350, 150, 30);
         lblid.setFont(new Font("serif", Font.PLAIN, 20));
         add(lblid);
 
-        add = new JButton("Add");
+        try {
+            Conn c = new Conn();
+            String query = "select * from employee where ID = '" + empId + "'";
+            ResultSet rs = c.s.executeQuery(query);
+            while (rs.next()) {
+                lblname.setText(rs.getString("Name"));
+                lbldob.setText(rs.getString("Date of Birth"));
+                tfsalary.setText(rs.getString("Salary"));
+                tfaddress.setText(rs.getString("Address"));
+                tfphone.setText(rs.getString("Phone"));
+                tfemail.setText(rs.getString("Email"));
+                tfdesignation.setText(rs.getString("Designation"));
+                tfeducation.setText(rs.getString("Education"));
+                lblaadhar.setText(rs.getString("Aadhar Number"));
+                lblid.setText(rs.getString("ID"));
+
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        add = new JButton("Update");
         add.setBounds(250, 550, 150, 40);
         add.setFont(new Font("serif", Font.BOLD, 20));
         add.addActionListener(this);
@@ -142,34 +165,45 @@ public class AddEmployee extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent ae) {
 
         if (ae.getSource() == add) {
-            String name = tfname.getText();
-            String dob = ((JTextField) dcdob.getDateEditor().getUiComponent()).getText();
             String salary = tfsalary.getText();
             String address = tfaddress.getText();
             String phone = tfphone.getText();
             String email = tfemail.getText();
             String education = tfeducation.getText();
             String designation = tfdesignation.getText();
-            String aadhar = tfaadhar.getText();
-            String empId = lblid.getText();
 
             try {
-                Conn con = new Conn();
-                String query = "INSERT INTO  Employee values ('"+empId+"', '"+name+"', '"+dob+"', '"+phone+"', '"+salary+"', '"+address+"', '"+email+"', '"+designation+"', '"+education+"', '"+aadhar+"')";
-                con.s.executeUpdate(query);
-                JOptionPane.showMessageDialog(null, "Details added successfully");
+                Conn c = new Conn();
+                // Use backticks only if column names contain spaces. Better: change your DB columns to use underscores.
+                String updateSql = "UPDATE `employee` SET `Phone` = ?, `Salary` = ?, `Address` = ?, `Email` = ?, `Designation` = ?, `Education` = ? WHERE `ID` = ?";
+                java.sql.PreparedStatement ps = c.con.prepareStatement(updateSql); // assuming Conn exposes Connection as 'con'
+                ps.setString(1, phone);
+                ps.setString(2, salary);
+                ps.setString(3, address);
+                ps.setString(4, email);
+                ps.setString(5, designation);
+                ps.setString(6, education);
+                ps.setString(7, empId);
+
+                int updated = ps.executeUpdate();
+                if (updated > 0) {
+                    JOptionPane.showMessageDialog(null, "Details updated successfully");
+                } else {
+                    JOptionPane.showMessageDialog(null, "No record updated. Check employee ID.");
+                }
+                ps.close();
                 setVisible(false);
-                new Home();
+                new ViewEmployee();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
             setVisible(false);
-            new Home();
+            new ViewEmployee();
         }
     }
 
     public static void main(String[] args) {
-        new AddEmployee();
+        new UpdateEmployee("");
     }
 }

@@ -100,7 +100,8 @@ public class ViewEmployee extends JFrame implements ActionListener {
                 e.printStackTrace();
             }
         } else if (ae.getSource() == update) {
-
+            setVisible(false);
+            new UpdateEmployee(cemployeeId.getSelectedItem());
         } else {
             setVisible(false);
             new Home();
